@@ -1,0 +1,235 @@
+{
+    "AcquisitionDate": "2020-09-01T04:00:00Z",
+    "AppID": 32,
+    "AppName": "ITS EUC Assets/CIs",
+    "Attachments": [],
+    "Attributes": [
+        {
+            "AssociatedItemIDs": [
+                0
+            ],
+            "Choices": [
+                {
+                    "DateCreated": "2020-03-11T18:34:57.383Z",
+                    "DateModified": "2020-03-11T18:34:57.383Z",
+                    "ID": 438,
+                    "IsActive": true,
+                    "Name": "Primary",
+                    "Order": 0
+                },
+                {
+                    "DateCreated": "2020-03-11T18:35:10.11Z",
+                    "DateModified": "2020-03-11T18:35:16.747Z",
+                    "ID": 439,
+                    "IsActive": true,
+                    "Name": "Dedicated",
+                    "Order": 1
+                },
+                {
+                    "DateCreated": "2020-03-11T18:35:28.447Z",
+                    "DateModified": "2020-03-11T18:35:35.717Z",
+                    "ID": 440,
+                    "IsActive": true,
+                    "Name": "Shared",
+                    "Order": 2
+                },
+                {
+                    "DateCreated": "2020-03-11T18:35:48.877Z",
+                    "DateModified": "2020-03-11T18:35:55.747Z",
+                    "ID": 441,
+                    "IsActive": true,
+                    "Name": "Loaner",
+                    "Order": 3
+                },
+                {
+                    "DateCreated": "2020-03-11T18:36:07.68Z",
+                    "DateModified": "2020-03-11T18:36:14.16Z",
+                    "ID": 442,
+                    "IsActive": true,
+                    "Name": "Kiosk",
+                    "Order": 4
+                },
+                {
+                    "DateCreated": "2020-03-11T18:36:27.013Z",
+                    "DateModified": "2020-03-11T18:36:33.007Z",
+                    "ID": 443,
+                    "IsActive": true,
+                    "Name": "Lab",
+                    "Order": 5
+                },
+                {
+                    "DateCreated": "2022-08-12T16:29:13.377Z",
+                    "DateModified": "2022-08-12T16:29:13.377Z",
+                    "ID": 25641,
+                    "IsActive": true,
+                    "Name": "Digital Sign",
+                    "Order": 6
+                }
+            ],
+            "ChoicesText": "Loaner",
+            "DataType": "String",
+            "Description": "",
+            "FieldType": "dropdown",
+            "ID": 2240,
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Name": "Function",
+            "Order": 0,
+            "SectionID": 0,
+            "SectionName": null,
+            "Value": "441",
+            "ValueText": "Loaner"
+        },
+        {
+            "AssociatedItemIDs": [
+                0
+            ],
+            "Choices": [
+                {
+                    "DateCreated": "2020-03-11T18:30:57.767Z",
+                    "DateModified": "2020-03-11T18:30:57.767Z",
+                    "ID": 432,
+                    "IsActive": true,
+                    "Name": "MiWorkspace - Managed",
+                    "Order": 0
+                },
+                {
+                    "DateCreated": "2020-03-11T18:31:11.417Z",
+                    "DateModified": "2020-03-11T18:31:18.493Z",
+                    "ID": 433,
+                    "IsActive": true,
+                    "Name": "MiWorkspace - Unmanaged",
+                    "Order": 1
+                },
+                {
+                    "DateCreated": "2020-03-11T18:31:36.22Z",
+                    "DateModified": "2020-03-11T18:31:42.173Z",
+                    "ID": 434,
+                    "IsActive": true,
+                    "Name": "Digital Signage",
+                    "Order": 2
+                },
+                {
+                    "DateCreated": "2020-03-11T18:31:56.89Z",
+                    "DateModified": "2020-03-11T18:32:08.437Z",
+                    "ID": 435,
+                    "IsActive": true,
+                    "Name": "Campus Computing Sites",
+                    "Order": 3
+                },
+                {
+                    "DateCreated": "2020-03-11T18:32:25.877Z",
+                    "DateModified": "2020-03-11T18:33:17.19Z",
+                    "ID": 436,
+                    "IsActive": true,
+                    "Name": "PCI",
+                    "Order": 4
+                },
+                {
+                    "DateCreated": "2020-03-11T18:32:55.517Z",
+                    "DateModified": "2020-03-11T18:33:04.88Z",
+                    "ID": 437,
+                    "IsActive": true,
+                    "Name": "Unit Managed",
+                    "Order": 5
+                }
+            ],
+            "ChoicesText": "Campus Computing Sites",
+            "DataType": "String",
+            "Description": "",
+            "FieldType": "dropdown",
+            "ID": 2237,
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Name": "Business Service",
+            "Order": 0,
+            "SectionID": 0,
+            "SectionName": null,
+            "Value": "435",
+            "ValueText": "Campus Computing Sites"
+        },
+        {
+            "AssociatedItemIDs": [
+                0
+            ],
+            "Choices": [],
+            "ChoicesText": "",
+            "DataType": "String",
+            "Description": "",
+            "FieldType": "textbox",
+            "ID": 2241,
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Name": "PO Number",
+            "Order": 0,
+            "SectionID": 0,
+            "SectionName": null,
+            "Value": "3006128319",
+            "ValueText": "3006128319"
+        },
+        {
+            "AssociatedItemIDs": [
+                0
+            ],
+            "Choices": [],
+            "ChoicesText": "",
+            "DataType": "String",
+            "Description": "",
+            "FieldType": "textbox",
+            "ID": 2242,
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Name": "Purchase Shortcode",
+            "Order": 0,
+            "SectionID": 0,
+            "SectionName": null,
+            "Value": "194550",
+            "ValueText": "194550"
+        }
+    ],
+    "ConfigurationItemID": 146369,
+    "CreatedDate": "2020-10-02T22:20:58.06Z",
+    "CreatedFullName": "Kristen Bolger",
+    "CreatedUid": "3df5dfbc-f541-ea11-a819-000d3a8e391e",
+    "ExpectedReplacementDate": "2023-09-02T04:00:00Z",
+    "ExternalID": "",
+    "ExternalSourceID": 0,
+    "ExternalSourceName": "None",
+    "FormID": 7,
+    "FormName": "Default Asset Form",
+    "ID": 61336,
+    "LocationID": 31,
+    "LocationName": "MICHIGAN UNION",
+    "LocationRoomID": 0,
+    "LocationRoomName": "None",
+    "MaintenanceScheduleID": 0,
+    "MaintenanceScheduleName": "None",
+    "ManufacturerID": 4,
+    "ManufacturerName": "Dell",
+    "ModifiedDate": "2023-07-26T14:50:14.63Z",
+    "ModifiedFullName": "Chris McDonald",
+    "ModifiedUid": "28e89c5e-9071-ea11-a81b-000d3a8e391e",
+    "Name": "SAH-41QQK63",
+    "OwningCustomerID": "00000000-0000-0000-0000-000000000000",
+    "OwningCustomerName": "None",
+    "OwningDepartmentID": 3127,
+    "OwningDepartmentName": "ITS SS Campus Computing  481020",
+    "ParentID": 0,
+    "ParentName": null,
+    "ParentSerialNumber": "None",
+    "ParentTag": null,
+    "ProductModelID": 2097,
+    "ProductModelName": "Latitude 14 5400",
+    "PurchaseCost": 0.0,
+    "RequestingCustomerID": "00000000-0000-0000-0000-000000000000",
+    "RequestingCustomerName": "None",
+    "RequestingDepartmentID": 0,
+    "RequestingDepartmentName": "None",
+    "SerialNumber": "41QQK63",
+    "StatusID": 9,
+    "StatusName": "In Stock - Available",
+    "SupplierID": 0,
+    "SupplierName": "None",
+    "Tag": "SAH00001",
+    "Uri": "api/32/assets/61336"
+}
