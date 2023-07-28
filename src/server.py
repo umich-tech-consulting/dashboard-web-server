@@ -5,6 +5,8 @@ from typing import Any
 import os
 import json
 import time
+import asset_lib
+
 
 tdx = tdxapi.TeamDynamixInstance(
     domain="teamdynamix.umich.edu",
@@ -52,9 +54,8 @@ async def get_ticket(ticket_id: str) -> dict[str, Any]:
 
 @app.post("/tdx/loan/checkout")  # type : ignore
 async def checkout():
-    await request.get_data(parse_form_data=True)
-    print(await request.body)
-    return {"Hello": "World"}
+    data = await request.json
+    return data["asset"]
 
 
 @app.get("/test/sample_asset")  # type : ignore

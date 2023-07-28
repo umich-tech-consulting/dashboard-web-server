@@ -76,30 +76,30 @@ async def inventory_asset(  # pylint: disable=too-many-arguments
     await tdx.update_asset(asset)
 
 
-# async def find_asset(
-#         tdx: tdxapi.TeamDynamixInstance, asset_tag: str
-# ) -> dict[str, Any]:
-#     """Find an asset based on tag.
+async def find_asset(
+        tdx: tdxapi.TeamDynamixInstance, asset_tag: str
+) -> dict[str, Any]:
+    """Find an asset based on tag.
 
-#     Args:
-#         tdx (tdxapi.TeamDynamixInstance): TeamDynamix instance to search
-#         asset_tag (str): Asset tag to searched
+    Args:
+        tdx (tdxapi.TeamDynamixInstance): TeamDynamix instance to search
+        asset_tag (str): Asset tag to searched
 
-#     Returns:
-#         dict[str, Any]: Returns an asset dictionary
-#     """
-#     print(f"Searching for asset {asset_tag}...")
-#     assets = await tdx.search_assets(asset_tag)
-#     if len(assets) == 0:
-#         raise tdxapi.ObjectNotFoundException
-#     elif len(assets) > 1:
-#         asset = _multiple_matches_chooser(assets, "Tag")
-#         deep_asset = await tdx.get_asset(asset["ID"])
-#         return deep_asset
-#     else:
-#         asset = await tdx.get_asset(assets[0]["ID"])
-#         print(f"Found asset {asset_tag}")
-#         return asset
+    Returns:
+        dict[str, Any]: Returns an asset dictionary
+    """
+    print(f"Searching for asset {asset_tag}...")
+    assets = await tdx.search_assets(asset_tag)
+    if len(assets) == 0:
+        raise tdxapi.ObjectNotFoundException
+    elif len(assets) > 1:
+        asset = _multiple_matches_chooser(assets, "Tag")
+        deep_asset = await tdx.get_asset(asset["ID"])
+        return deep_asset
+    else:
+        asset = await tdx.get_asset(assets[0]["ID"])
+        print(f"Found asset {asset_tag}")
+        return asset
 
 
 # def find_person_uid(tdx: tdxapi.TeamDynamixInstance, uniqname: str) -> str:
