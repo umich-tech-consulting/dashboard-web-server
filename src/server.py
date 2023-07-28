@@ -3,6 +3,8 @@ from quart import Quart, request
 import tdxapi
 from typing import Any
 import os
+import json
+import time
 
 tdx = tdxapi.TeamDynamixInstance(
     domain="teamdynamix.umich.edu",
@@ -53,3 +55,11 @@ async def checkout():
     await request.get_data(parse_form_data=True)
     print(await request.body)
     return {"Hello": "World"}
+
+
+@app.get("/test/sample_asset")  # type : ignore
+async def test():
+    with open('./resources/sample_asset.json') as asset_file:
+        sample_asset = json.load(asset_file)
+        time.sleep(5)
+        return sample_asset
