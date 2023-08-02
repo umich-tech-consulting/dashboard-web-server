@@ -102,27 +102,27 @@ async def find_asset(
         return asset
 
 
-# def find_person_uid(tdx: tdxapi.TeamDynamixInstance, uniqname: str) -> str:
-#     """Find the UID of a person in TDx based on uniqname.
+def find_person_uid(tdx: tdxapi.TeamDynamixInstance, uniqname: str) -> str:
+    """Find the UID of a person in TDx based on uniqname.
 
-#     Args:
-#         tdx (tdxapi.TeamDynamixInstance): _description_
-#         uniqname (str): _description_
+    Args:
+        tdx (tdxapi.TeamDynamixInstance): _description_
+        uniqname (str): _description_
 
-#     Returns:
-#         str: _description_
-#     """
-#     print(f"Searching for person with uniqname {uniqname}")
-#     people = tdx.search_people(uniqname)
-#     if len(people) == 0:
-#         exit(f"No people with uniqname {uniqname} found, aborting...")
-#     elif len(people) > 1:
-#         person = _multiple_matches_chooser(people, "PrimaryEmail")
-#         return person["UID"]
-#     else:
-#        print(f"Found person with uniqname {uniqname}")
-#        person_uid = people[0]["UID"]
-#        return person_uid
+    Returns:
+        str: _description_
+    """
+    print(f"Searching for person with uniqname {uniqname}")
+    people = tdx.search_people(uniqname)
+    if len(people) == 0:
+        exit(f"No people with uniqname {uniqname} found, aborting...")
+    elif len(people) > 1:
+        person = _multiple_matches_chooser(people, "PrimaryEmail")
+        return person["UID"]
+    else:
+        print(f"Found person with uniqname {uniqname}")
+        person_uid = people[0]["UID"]
+        return person_uid
 
 
 def find_sah_request_ticket(
