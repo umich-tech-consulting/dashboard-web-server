@@ -58,8 +58,12 @@ async def get_ticket(ticket_id: str) -> dict[str, Any]:
 @app.post("/tdx/loan/checkout")  # type : ignore
 async def checkout():
     body = await request.json
+
+    # Error checking
+
     if not body:
         return "No body!"
+
     if "uniqname" not in body:
         return "Request must include uniqname", HTTPStatus.BAD_REQUEST
     if len(body["uniqname"]) < 3 or len(body["uniqname"]) > 8:
@@ -72,13 +76,16 @@ async def checkout():
         return f"Asset prefix must be SAH or TRL,\
               got {body['asset'][:3]}", HTTPStatus.BAD_REQUEST
 
-    owner_uid: str = asset_lib.find_person_uid(tdx, body["uniqname"])
+    owner_uid: str = await asset_lib.find_person_uid(tdx, body["uniqname"])
+
     asset: dict[str, Any] = await asset_lib.find_asset(tdx, body["asset"])
 
     ticket: dict[str, Any] = asset_lib.find_sah_request_ticket(tdx, owner_uid)
-
     ticket = tdx.get_ticket(ticket["ID"], "ITS Tickets")
-    loan_date = tdx.get_ticket_attribute(ticket, "sah_Loan Length (Term)")["ValueText"]
+    loan_date = tdx.get_ticket_attribute(
+        ticket,
+        "sah_Loan Length (Term)"
+    )["ValueText"]
     await asset_lib.check_out_asset(tdx, asset, ticket, owner_uid)
 
     response = {
@@ -105,3 +112,11 @@ async def test():
         sample_asset = json.load(asset_file)
         time.sleep(5)
         return sample_asset
+
+
+@app.errorhandler(tdxapi.exceptions.UniqnameDoesNotExistException)  # type: ignore
+async def handle_no_uniqname(error):
+    response = {
+        "error": "Uniqname does not exist in TDx"
+    }
+    return response, HTTPStatus.BAD_REQUEST
