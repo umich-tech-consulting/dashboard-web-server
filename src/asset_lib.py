@@ -6,7 +6,6 @@ Returns:
 
 from datetime import date
 from typing import Any, Optional
-
 import tdxapi
 
 
@@ -89,36 +88,35 @@ async def find_asset(
         dict[str, Any]: Returns an asset dictionary
     """
     print(f"Searching for asset {asset_tag}...")
-    assets = await tdx.search_assets(asset_tag)
+    assets: list[dict[str, Any]] = await tdx.search_assets(asset_tag)
     if len(assets) == 0:
-        raise tdxapi.ObjectNotFoundException
+        raise tdxapi.exceptions.ObjectNotFoundException
     elif len(assets) > 1:
-        asset = _multiple_matches_chooser(assets, "Tag")
-        deep_asset = await tdx.get_asset(asset["ID"])
-        return deep_asset
+        raise tdxapi.exceptions.MultipleMatchesException
     else:
         asset = await tdx.get_asset(assets[0]["ID"])
         print(f"Found asset {asset_tag}")
         return asset
 
 
-async def find_person_uid(tdx: tdxapi.TeamDynamixInstance, uniqname: str) -> str:
-    """Find the UID of a person in TDx based on uniqname.
+# async def find_person_uid(tdx: tdxapi.TeamDynamixInstance, uniqname: str) -> str:
+#     """Find the UID of a person in TDx based on uniqname.
 
-    Args:
-        tdx (tdxapi.TeamDynamixInstance): _description_
-        uniqname (str): _description_
+#     Args:
+#         tdx (tdxapi.TeamDynamixInstance): _description_
+#         uniqname (str): _description_
 
-    Returns:
-        str: _description_
-    """
-    people = await tdx.search_people(uniqname)
-    print(f"Found person with uniqname {uniqname}")
-    person_uid = people[0]["UID"]
-    return person_uid
+#     Returns:
+#         str: _description_
+#     """
+    
+#     people = await tdx.search_people(uniqname)
+#     print(f"Found person with uniqname {uniqname}")
+#     person_uid = people[0]["UID"]
+#     return person_uid
 
 
-def find_sah_request_ticket(
+async def find_sah_request_ticket(
     tdx: tdxapi.TeamDynamixInstance, person_uid: str
 ) -> dict[str, Any]:
     """Find a ticket assigned to ITS-Sitesathome with title Sites@Home Request.
@@ -131,20 +129,19 @@ def find_sah_request_ticket(
         dict: Latest matching ticket
     """
     print("Searching for Sites@Home request tickets")
-    tickets = tdx.search_tickets(
+    tickets: list[dict[str, Any]] = tdx.search_tickets(
         person_uid,
         ["Open", "Scheduled", "Closed"],
         "Sites @ Home Request",
         "ITS-SitesatHome",
     )
     if len(tickets) == 0:
-        exit("No matching tickets found, aborting...")
+        raise tdxapi.exceptions.ObjectNotFoundException
 
     elif len(tickets) > 1:
-        ticket = _multiple_matches_chooser(tickets, "ID")
-        return tdx.get_ticket(ticket["ID"])
+        raise tdxapi.exceptions.MultipleMatchesException
     else:
-        ticket = tdx.get_ticket(tickets[0]["ID"])
+        ticket: dict[str, Any] = tdx.get_ticket(tickets[0]["ID"])
         print(f"Found ticket TDx {ticket['ID']}")
         return ticket
 
@@ -190,7 +187,7 @@ async def check_out_asset(
     tdx: tdxapi.TeamDynamixInstance,
     asset: dict[str, Any],
     ticket: dict[str, Any],
-    person_uid: str
+    owner: dict[str, Any]
 ) -> None:
     """Assign asset to person and attach to ticket.
 
@@ -202,11 +199,11 @@ async def check_out_asset(
     """
     tdx.attach_asset_to_ticket(ticket["ID"], asset["ID"])
     print(f"Attached asset to ticket {ticket['ID']}")
-    loan_period = tdx.get_ticket_attribute(ticket, "sah_Loan Length (Term)")[
-        "ValueText"
-    ]
+    loan_period: str = \
+        tdx.get_ticket_attribute(ticket, "sah_Loan Length (Term)")["ValueText"]
     tdx.update_ticket_status(
-        ticket["ID"], "Closed", "Checked out by Tech Consulting"
+        ticket["ID"], "Closed", "Checked out to "
+        f"{owner['AlternateID']} until {loan_period}"
     )
 
     await inventory_asset(
@@ -214,8 +211,9 @@ async def check_out_asset(
         asset,
         "Offsite",
         "On Loan",
-        person_uid,
-        f"On Loan until {loan_period}"
+        owner["UID"],
+        f"On Loan to {owner['AlternateID']}"
+        f" in {ticket['ID']} until {loan_period}"
     )
 
 
