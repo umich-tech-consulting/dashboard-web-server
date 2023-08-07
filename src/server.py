@@ -73,21 +73,21 @@ async def checkout():
 
     # Error checking
     if not body:
-        raise exceptions.MissingBodyException 
-    
+        raise exceptions.MissingBodyException
+
     # Uniqname and asset are the only required parts of the body
     if "uniqname" not in body:
         raise exceptions.MalformedBodyException
     if "asset" not in body:
         raise exceptions.MalformedBodyException
-    
+
     uniqname: str = body["uniqname"].lower()  # Account for caps
-
-    if not uniqname_pattern.match(uniqname):  # Uniqname is 3-8 alpha characters
-        raise exceptions.InvalidUniqnameException
-
-    if not asset_pattern.match(body["asset"]):  # Asset is SAHM, TRL, or SAH with digits
-        raise exceptions.InvalidAssetException
+    # Uniqname is 3-8 alpha characters
+    if not uniqname_pattern.match(uniqname):
+        raise exceptions.InvalidUniqnameException(uniqname)
+    # Asset is SAHM, TRL, or SAH with digits
+    if not asset_pattern.match(body["asset"]):
+        raise exceptions.InvalidAssetException(body["asset"])
 
     # We can get everything we need for a loan from just the asset and uniqname
     # by searching for matching loan tickets requested by the uniqname, pulling
@@ -102,7 +102,7 @@ async def checkout():
     asset: dict[str, Any] = await asset_lib.find_asset(tdx, body["asset"])
 
     ticket: dict[str, Any] = \
-        await asset_lib.find_sah_request_ticket(tdx, owner["UID"])
+        await asset_lib.find_sah_request_ticket(tdx, owner)
     ticket = tdx.get_ticket(ticket["ID"], "ITS Tickets")
     loan_date = tdx.get_ticket_attribute(
         ticket,
@@ -139,12 +139,84 @@ async def test():
         return sample_asset
 
 
-@app.errorhandler(tdxapi.exceptions.UniqnameDoesNotExistException)  # type: ignore
+@app.errorhandler(
+    tdxapi.exceptions.UniqnameDoesNotExistException
+)  # type: ignore
 async def handle_no_uniqname(
-        error: tdxapi.exceptions.UniqnameDoesNotExistException
-    ):
+    error: tdxapi.exceptions.UniqnameDoesNotExistException
+):
     response: dict[str, int | Any | dict[str, Any]] = {
         "error_number": 1,
+        "message": error.message,
+        "attributes": {
+            "uniqname": error.uniqname
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(exceptions.AssetNotFoundException)  # type: ignore
+async def handle_object_not_found(
+    error: exceptions.AssetNotFoundException
+):
+    response = {
+        "error_number": 2,
+        "message": error.message,
+        "attributes": {
+            "asset": error.asset
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(tdxapi.exceptions.MultipleMatchesException)  # type: ignore
+async def handle_multiple_matches(
+    error: tdxapi.exceptions.MultipleMatchesException
+):
+    response = {
+        "error_number": 3,
+        "message": error.message,
+        "attributes": {
+            "type": error.type
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(exceptions.InvalidUniqnameException)  # type: ignore
+async def handle_invalid_uniqname(
+    error: exceptions.InvalidUniqnameException
+):
+    response = {
+        "error_number": 4,
+        "message": error.message,
+        "attributes": {
+            "uniqname": error.uniqname
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(exceptions.InvalidAssetException)  # type: ignore
+async def handle_invalid_asset(
+    error: exceptions.InvalidAssetException
+):
+    response = {
+        "error_number": 5,
+        "message": error.message,
+        "attributes": {
+            "asset": error.asset
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(exceptions.NoLoanRequestException)  # type: ignore
+async def handle_no_loan_request(
+    error: exceptions.NoLoanRequestException
+):
+    response = {
+        "error_number": 6,
         "message": error.message,
         "attributes": {
             "uniqname": error.uniqname

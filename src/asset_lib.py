@@ -7,6 +7,7 @@ Returns:
 from datetime import date
 from typing import Any, Optional
 import tdxapi
+import exceptions
 
 
 async def inventory_asset(  # pylint: disable=too-many-arguments
@@ -90,16 +91,18 @@ async def find_asset(
     print(f"Searching for asset {asset_tag}...")
     assets: list[dict[str, Any]] = await tdx.search_assets(asset_tag)
     if len(assets) == 0:
-        raise tdxapi.exceptions.ObjectNotFoundException
+        raise exceptions.AssetNotFoundException(asset_tag)
     elif len(assets) > 1:
-        raise tdxapi.exceptions.MultipleMatchesException
+        raise tdxapi.exceptions.MultipleMatchesException("")
     else:
         asset = await tdx.get_asset(assets[0]["ID"])
         print(f"Found asset {asset_tag}")
         return asset
 
 
-# async def find_person_uid(tdx: tdxapi.TeamDynamixInstance, uniqname: str) -> str:
+# async def find_person_uid(
+#   tdx: tdxapi.TeamDynamixInstance,
+#   uniqname: str) -> str:
 #     """Find the UID of a person in TDx based on uniqname.
 
 #     Args:
@@ -109,7 +112,7 @@ async def find_asset(
 #     Returns:
 #         str: _description_
 #     """
-    
+
 #     people = await tdx.search_people(uniqname)
 #     print(f"Found person with uniqname {uniqname}")
 #     person_uid = people[0]["UID"]
@@ -117,7 +120,7 @@ async def find_asset(
 
 
 async def find_sah_request_ticket(
-    tdx: tdxapi.TeamDynamixInstance, person_uid: str
+    tdx: tdxapi.TeamDynamixInstance, person: dict[str, Any]
 ) -> dict[str, Any]:
     """Find a ticket assigned to ITS-Sitesathome with title Sites@Home Request.
 
@@ -130,16 +133,16 @@ async def find_sah_request_ticket(
     """
     print("Searching for Sites@Home request tickets")
     tickets: list[dict[str, Any]] = tdx.search_tickets(
-        person_uid,
+        person["UID"],
         ["Open", "Scheduled", "Closed"],
         "Sites @ Home Request",
         "ITS-SitesatHome",
     )
     if len(tickets) == 0:
-        raise tdxapi.exceptions.ObjectNotFoundException
+        raise exceptions.NoLoanRequestException(person["AlternateID"])
 
     elif len(tickets) > 1:
-        raise tdxapi.exceptions.MultipleMatchesException
+        raise tdxapi.exceptions.MultipleMatchesException("person")
     else:
         ticket: dict[str, Any] = tdx.get_ticket(tickets[0]["ID"])
         print(f"Found ticket TDx {ticket['ID']}")
@@ -162,7 +165,7 @@ def find_sah_drop_off_ticket(
         dict: _description_
     """
     print("Searching for Sites@Home return tickets")
-    tickets = tdx.search_tickets(
+    tickets: list[dict[str, Any]] = tdx.search_tickets(
         person_uid,
         [
             "New",
