@@ -60,3 +60,16 @@ class NoLoanRequestException(Exception):
         self.uniqname: str = uniqname
         self.message: str = message
         super().__init__(self.message)
+
+
+class AssetNotReadyToLoan(Exception):
+    """Asset is not in stock available."""
+
+    def __init__(
+            self,
+            asset: str,
+            message: str = "Asset not ready to loan"
+    ):
+        self.asset: str = asset
+        self.message: str = message
+        super().__init__(self.message)

@@ -10,6 +10,7 @@ from http import HTTPStatus
 import quart_cors
 import exceptions
 import re
+import asyncio
 
 # Regex patterns
 
@@ -97,10 +98,26 @@ async def checkout():
     # update the last inventory date, and add on loan until to notes
 
     # Gather info
-    owner: dict[str, Any] = await tdx.search_person(uniqname) 
 
-    asset: dict[str, Any] = await asset_lib.find_asset(tdx, body["asset"])
+    owner_task: asyncio.Task[dict[str, Any]] = \
+        asyncio.create_task(
+            tdx.search_person(uniqname),
+            name="Find Owner"
+        )
 
+    asset_task: asyncio.Task[dict[str, Any]] = \
+        asyncio.create_task(
+            asset_lib.find_asset(tdx, body["asset"]),
+            name="Find Asset"
+        )
+
+    available_id: str = tdx.get_id(
+        "ITS EUC Assets/CIs",
+        "In Stock - Available",
+        "AssetStatusIDs"
+    )
+
+    owner: dict[str, Any] = await owner_task
     ticket: dict[str, Any] = \
         await asset_lib.find_sah_request_ticket(tdx, owner)
     ticket = tdx.get_ticket(ticket["ID"], "ITS Tickets")
@@ -109,6 +126,9 @@ async def checkout():
         "sah_Loan Length (Term)"
     )["ValueText"]
 
+    asset: dict[str, Any] = await asset_task
+    if (asset["StatusID"] is not available_id):
+        raise exceptions.AssetNotReadyToLoan(asset["Tag"])
     # ... and then everything else
     await asset_lib.check_out_asset(tdx, asset, ticket, owner)
 
@@ -220,6 +240,20 @@ async def handle_no_loan_request(
         "message": error.message,
         "attributes": {
             "uniqname": error.uniqname
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(exceptions.AssetNotReadyToLoan)  # type: ignore
+async def handle_asset_not_ready(
+    error: exceptions.AssetNotReadyToLoan
+):
+    response = {
+        "error_number": 7,
+        "message": error.message,
+        "attributes": {
+            "asset": error.asset
         }
     }
     return response, HTTPStatus.BAD_REQUEST
