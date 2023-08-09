@@ -135,7 +135,8 @@ async def checkout():
     if (asset["StatusID"] is not available_id):
         raise exceptions.AssetNotReadyToLoan(asset["Tag"])
     # ... and then everything else
-    await asset_lib.check_out_asset(tdx, asset, ticket, owner)
+    if body["comments"]:
+        await asset_lib.check_out_asset(tdx, asset, ticket, owner, body["comments"])
 
     # Give some useful info back to the front end to display to user
     response: dict[str, dict[str, Any]] = {
