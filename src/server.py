@@ -81,8 +81,13 @@ async def checkout():
         raise exceptions.MalformedBodyException
     if "asset" not in body:
         raise exceptions.MalformedBodyException
+    uniqname: str = body["uniqname"].lower()
 
-    uniqname: str = body["uniqname"].lower()  # Account for caps
+    # Uncomment if needed for error checking
+    # if uniqname == "mctester":
+    #     raise tdxapi.exceptions.MultipleMatchesException("person")
+
+    # Account for caps
     # Uniqname is 3-8 alpha characters
     if not uniqname_pattern.match(uniqname):
         raise exceptions.InvalidUniqnameException(uniqname)
@@ -162,7 +167,7 @@ async def test():
 @app.errorhandler(
     tdxapi.exceptions.UniqnameDoesNotExistException
 )  # type: ignore
-async def handle_no_uniqname(
+async def handle_uniqname_not_found(
     error: tdxapi.exceptions.UniqnameDoesNotExistException
 ):
     response: dict[str, int | Any | dict[str, Any]] = {
@@ -182,6 +187,8 @@ async def handle_object_not_found(
     response = {
         "error_number": 2,
         "message": error.message,
+
+        "details": "TESGIN!!!",
         "attributes": {
             "asset": error.asset
         }
@@ -253,7 +260,7 @@ async def handle_asset_not_ready(
         "error_number": 7,
         "message": error.message,
         "attributes": {
-            "asset": error.asset
+            "asset": error.asset,
         }
     }
     return response, HTTPStatus.BAD_REQUEST

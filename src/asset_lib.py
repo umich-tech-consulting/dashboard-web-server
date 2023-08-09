@@ -190,7 +190,8 @@ async def check_out_asset(
     tdx: tdxapi.TeamDynamixInstance,
     asset: dict[str, Any],
     ticket: dict[str, Any],
-    owner: dict[str, Any]
+    owner: dict[str, Any],
+    comments: Optional[str]
 ) -> None:
     """Assign asset to person and attach to ticket.
 
@@ -215,6 +216,7 @@ async def check_out_asset(
         "Offsite",
         "On Loan",
         owner["UID"],
+        f"{comments}\n\n"
         f"On Loan to {owner['AlternateID']}"
         f" in {ticket['ID']} until {loan_period}"
     )

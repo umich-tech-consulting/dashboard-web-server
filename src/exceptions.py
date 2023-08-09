@@ -73,3 +73,16 @@ class AssetNotReadyToLoan(Exception):
         self.asset: str = asset
         self.message: str = message
         super().__init__(self.message)
+
+
+class LoanAlreadyFullfilledException(Exception):
+    """Laptop has already been provided for loan."""
+
+    def __init__(
+            self,
+            ticket: str,
+            message: str = "Loan has already been fulfilled"
+    ):
+        self.ticket = ticket
+        self.message = message
+        super().__init__(self.message)
