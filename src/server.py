@@ -44,28 +44,36 @@ async def init() -> None:
 #####################
 
 
-@app.route("/tdx/asset/<asset_tag>")  # type: ignore
-async def get_asset(asset_tag: str) -> dict[str, Any]:
-    assets: list[dict[str, Any]] = \
-        await tdx.search_assets(asset_tag, "ITS EUC Assets/CIs")
-    asset: dict[str, Any] = \
-        await tdx.get_asset(assets[0]["ID"], "ITS EUC Assets/CIs")
-    return asset
+# @app.route("/tdx/asset/<asset_tag>")  # type: ignore
+# async def get_asset(asset_tag: str) -> dict[str, Any]:
+#     assets: list[dict[str, Any]] = \
+#         await tdx.search_assets(asset_tag, "ITS EUC Assets/CIs")
+#     asset: dict[str, Any] = \
+#         await tdx.get_asset(assets[0]["ID"], "ITS EUC Assets/CIs")
+#     return asset
 
 
-@app.get("/tdx/currentuser")  # type: ignore
-async def get_current_user() -> dict[str, Any]:
-    return tdx.get_current_user()
+# @app.get("/tdx/currentuser")  # type: ignore
+# async def get_current_user() -> dict[str, Any]:
+#     return tdx.get_current_user()
 
 
-@app.get("/tdx/people/<uniqname>")  # type: ignore
-async def get_person(uniqname: str) -> dict[str, Any]:
-    return await tdx.search_person(uniqname)
+# @app.get("/tdx/people/<uniqname>")  # type: ignore
+# async def get_person(uniqname: str) -> dict[str, Any]:
+#     return await tdx.search_person(uniqname)
 
 
-@app.get("/tdx/ticket/<ticket_id>")  # type: ignore
-async def get_ticket(ticket_id: str) -> dict[str, Any]:
-    return tdx.get_ticket(ticket_id)
+# @app.get("/tdx/ticket/<ticket_id>")  # type: ignore
+# async def get_ticket(ticket_id: str) -> dict[str, Any]:
+#     return tdx.get_ticket(ticket_id)
+
+@app.post("/tdx/loan/return")  # type : ignore
+async def dropoff():
+    body = await request.json
+    if not body:
+        raise exceptions.MissingBodyException
+    if "asset" not in body:
+        raise exceptions.MalformedBodyException
 
 
 @app.post("/tdx/loan/checkout")  # type : ignore
