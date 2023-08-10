@@ -212,14 +212,12 @@ async def check_out_asset(
     print(f"Attached asset to ticket {ticket['ID']}")
     loan_period: str = \
         tdx.get_ticket_attribute(ticket, "sah_Loan Length (Term)")["ValueText"]
-    tdx.update_ticket_status(
-        ticket["ID"], "Closed", "Checked out to "
-        f"{owner['AlternateID']} until {loan_period}"
-    )
-
     notes: str = (
-        f"{comment}\n\n On Loan to {owner['AlternateID']} "
-        f"in {ticket['ID']} until {loan_period}"
+        f"On Loan to {owner['AlternateID']} "
+        f"in {ticket['ID']} until {loan_period}\n\n{comment}"
+    )
+    tdx.update_ticket_status(
+        ticket["ID"], "Closed", notes
     )
 
     await inventory_asset(
