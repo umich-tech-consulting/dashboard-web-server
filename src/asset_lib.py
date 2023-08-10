@@ -198,7 +198,7 @@ async def check_out_asset(
     asset: dict[str, Any],
     ticket: dict[str, Any],
     owner: dict[str, Any],
-    comments: Optional[str]
+    comments: Optional[str] = ""
 ) -> None:
     """Assign asset to person and attach to ticket.
 
