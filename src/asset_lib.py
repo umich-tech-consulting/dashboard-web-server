@@ -218,7 +218,7 @@ async def check_out_asset(
     )
 
     notes = f"""{comment}\n\n On Loan to {owner['AlternateID']} \
-        in {ticket['ID']} until {loan_period}"""
+    in {ticket['ID']} until {loan_period}"""
 
     await inventory_asset(
         tdx,
