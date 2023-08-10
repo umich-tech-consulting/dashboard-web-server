@@ -133,7 +133,7 @@ async def find_sah_request_ticket(
     """
     print("Searching for Sites@Home request tickets")
     criteria = {
-        "RequesterUid": person["UID"],
+        "RequesterUids": [person["UID"]],
         "StatusIDs": tdx.get_id(
             "ITS Tickets",
             "Closed",
