@@ -217,15 +217,17 @@ async def check_out_asset(
         f"{owner['AlternateID']} until {loan_period}"
     )
 
+    notes = f"""{comment}\n\n On Loan to {owner['AlternateID']} \
+        in {ticket['ID']} until {loan_period}"""
+
     await inventory_asset(
         tdx,
         asset,
         "Offsite",
         "On Loan",
         owner["UID"],
-        f"{comment}\n\n"
-        f"On Loan to {owner['AlternateID']}"
-        f" in {ticket['ID']} until {loan_period}"
+        notes,
+        update_inv_date=True
     )
 
 
