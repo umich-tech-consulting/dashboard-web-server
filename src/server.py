@@ -136,15 +136,15 @@ async def checkout():
         raise exceptions.AssetNotReadyToLoan(asset["Tag"])
     # ... and then everything else
 
-    if "comments" not in body:
-        body["comments"] = ""
+    if "comment" not in body:
+        body["comment"] = ""
 
     await asset_lib.check_out_asset(
         tdx,
         asset,
         ticket,
         owner,
-        body["comments"]
+        body["comment"]
     )
     # Give some useful info back to the front end to display to user
     response: dict[str, dict[str, Any]] = {
