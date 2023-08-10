@@ -3,7 +3,7 @@ This is the web server that acts at a backend for `tech-consulting-dashboard` an
 
 ## Features 
 * [TeamDynamix WebAPI](https://teamdynamix.umich.edu/TDWebApi/)
-  * Check out assets requested in a loaner ticket
+  * Check out assets requested in a loaner ticket with robust error handling
 
 ## Planned Features
 * [TeamDynamix WebAPI](https://teamdynamix.umich.edu/TDWebApi/)
