@@ -132,11 +132,22 @@ async def find_sah_request_ticket(
         dict: Latest matching ticket
     """
     print("Searching for Sites@Home request tickets")
+    criteria = {
+        "RequesterUid": person["UID"],
+        "StatusIDs": tdx.get_id(
+            "ITS Tickets",
+            "Closed",
+            "TicketStatusIDs"
+        ),
+        "ResponsibleUid": tdx.get_id(
+            "GroupIDs",
+            "ITS-SitesatHome",
+        ),
+
+    }
     tickets: list[dict[str, Any]] = tdx.search_tickets(
-        person["UID"],
-        ["Open", "Scheduled", "Closed"],
-        "Sites @ Home Request",
-        "ITS-SitesatHome",
+        title="ITS-SitesatHome",
+        criteria=criteria
     )
     if len(tickets) == 0:
         raise exceptions.NoLoanRequestException(person["AlternateID"])
