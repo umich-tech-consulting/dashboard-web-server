@@ -133,20 +133,16 @@ async def find_sah_request_ticket(
     """
     print("Searching for Sites@Home request tickets")
     criteria = {
-        "RequesterUids": [person["UID"]],
-        "StatusIDs": tdx.get_id(
+        "RequestorUids": [person["UID"]],
+        "FormIDs": [tdx.get_id(
             "ITS Tickets",
-            "Closed",
-            "TicketStatusIDs"
-        ),
-        "ResponsibleUid": tdx.get_id(
-            "GroupIDs",
-            "ITS-SitesatHome",
-        ),
+            "ITS-Sites @ Home - Form",
+            "TicketFormIDs"
+        )]
 
     }
     tickets: list[dict[str, Any]] = tdx.search_tickets(
-        title="ITS-SitesatHome",
+        title="Sites @ Home Request",
         criteria=criteria
     )
     if len(tickets) == 0:
@@ -160,41 +156,41 @@ async def find_sah_request_ticket(
         return ticket
 
 
-def find_sah_drop_off_ticket(
-    tdx: tdxapi.TeamDynamixInstance, person_uid: str
-) -> dict[str, Any]:
-    """Find return request for Sites at Home laptop.
+# def find_sah_drop_off_ticket(
+#     tdx: tdxapi.TeamDynamixInstance, person_uid: str
+# ) -> dict[str, Any]:
+#     """Find return request for Sites at Home laptop.
 
-    Find a ticket assigned to ITS-SitesatHome with title\
-    IMPORTANT: Sites@Home Laptop Return or Extension.
+#     Find a ticket assigned to ITS-SitesatHome with title\
+#     IMPORTANT: Sites@Home Laptop Return or Extension.
 
-    Args:
-        tdx (tdxapi.TeamDynamixInstance): _description_
-        person_uid (str): _description_
+#     Args:
+#         tdx (tdxapi.TeamDynamixInstance): _description_
+#         person_uid (str): _description_
 
-    Returns:
-        dict: _description_
-    """
-    print("Searching for Sites@Home return tickets")
-    tickets: list[dict[str, Any]] = tdx.search_tickets(
-        person_uid,
-        [
-            "New",
-            "Open",
-            "Scheduled",
-        ],
-        "IMPORTANT: Sites@Home Laptop Return or Extension",
-        "ITS-SitesatHome",
-    )
-    if len(tickets) == 0:
-        raise tdxapi.ObjectNotFoundException
-    elif len(tickets) > 1:
-        ticket = _multiple_matches_chooser(tickets, "ID")
-        return ticket
-    else:
-        ticket = tdx.get_ticket(tickets[0]["ID"])
-        print(f"Found ticket TDx {ticket['ID']}")
-        return ticket
+#     Returns:
+#         dict: _description_
+#     """
+#     print("Searching for Sites@Home return tickets")
+#     tickets: list[dict[str, Any]] = tdx.search_tickets(
+#         person_uid,
+#         [
+#             "New",
+#             "Open",
+#             "Scheduled",
+#         ],
+#         "IMPORTANT: Sites@Home Laptop Return or Extension",
+#         "ITS-SitesatHome",
+#     )
+#     if len(tickets) == 0:
+#         raise tdxapi.ObjectNotFoundException
+#     elif len(tickets) > 1:
+#         ticket = _multiple_matches_chooser(tickets, "ID")
+#         return ticket
+#     else:
+#         ticket = tdx.get_ticket(tickets[0]["ID"])
+#         print(f"Found ticket TDx {ticket['ID']}")
+#         return ticket
 
 
 async def check_out_asset(
@@ -264,39 +260,3 @@ async def check_in_asset(
         "In Stock - Reserved",
         notes="Checked in by Tech Consulting",
     )
-
-
-def _multiple_matches_chooser(
-    matches: list[Any],
-    primary_key: Optional[str] = None
-) -> Any:
-    """Interactively choose a single object from a list.
-
-    Args:
-        matches (list[Any]): List of objects to choose from
-        primary_key (Optional[str]): Identifier to print if objects are dicts
-
-    Returns:
-        Any: The object that was selected
-    """
-    if len(matches) > 10:
-        print(f"Found {len(matches)} matches (max 10), aborting...")
-        exit()
-    else:
-        print(f"Found {len(matches)} matches, choose one to use:")
-    if primary_key:
-        i = 1
-        for obj in matches:
-            print(f"\t{i}: {obj[primary_key]}")
-            i += 1
-    else:
-        i = 1
-        for obj in matches:
-            print(f"\t{i}: {obj[0]}")
-            i += 1
-    choice = -1
-    while choice not in range(1, len(matches) + 1):
-        choice = int(input("Select an option: "))
-        if choice not in range(1, len(matches) + 1):
-            print(f"Invalid entry, select between 1 and {len(matches)}")
-    return matches[choice - 1]
