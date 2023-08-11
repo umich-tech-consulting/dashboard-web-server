@@ -82,8 +82,7 @@ async def dropoff():
         asyncio.create_task(
             asset_lib.find_asset(tdx, body["asset"]),
             name="Find Asset"
-        )
-    
+    )
     available_id: str = tdx.get_id(
         "ITS EUC Assets/CIs",
         "In Stock - Available",
