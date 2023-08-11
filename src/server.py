@@ -196,8 +196,6 @@ async def handle_object_not_found(
     response = {
         "error_number": 2,
         "message": error.message,
-
-        "details": "TESGIN!!!",
         "attributes": {
             "asset": error.asset
         }
