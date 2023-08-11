@@ -104,6 +104,7 @@ async def dropoff():
         "asset": {
             "tag": asset["Tag"],
             "id": asset["ID"],
+            "comment": body["comment"]
         },
         "previous_owner": {
             "uniqname": asset["OwningCustomerName"],
@@ -197,6 +198,7 @@ async def checkout():
         "asset": {
             "tag": asset["Tag"],
             "id": asset["ID"],
+            "comment": body["comment"]
         },
         "loan": {
             "name": ticket["RequestorName"],
