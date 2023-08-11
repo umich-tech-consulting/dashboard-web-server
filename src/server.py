@@ -96,7 +96,8 @@ async def dropoff():
 
     await asset_lib.check_in_asset(
         tdx,
-        asset
+        asset,
+        body["comment"]
     )
     # Give some useful info back to the front end to display to user
     response: dict[str, dict[str, Any]] = {

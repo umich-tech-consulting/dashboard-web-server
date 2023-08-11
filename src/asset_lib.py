@@ -234,7 +234,8 @@ async def check_out_asset(
 async def check_in_asset(
     tdx: tdxapi.TeamDynamixInstance,
     asset: dict[str, Any],
-    ticket: Optional[dict[str, Any]] = None
+    ticket: Optional[dict[str, Any]] = None,
+    comment: Optional[str] = ""
 ) -> None:
     """Check in a dropped off asset.
 
@@ -248,17 +249,21 @@ async def check_in_asset(
         asset (dict): Asset to check in
         ticket (dict): Ticket to attach asset to
     """
+    notes: str = (
+        f"Checked in by Tech Consulting\n\n{comment}"
+    )
     if ticket:
         tdx.attach_asset_to_ticket(ticket["ID"], asset["ID"])
         print(f"Attached asset to ticket {ticket['ID']}")
         tdx.update_ticket_status(
-            ticket["ID"], "Closed", "Checked in by Tech Consulting"
+            ticket["ID"], "Closed", notes
         )
 
     await inventory_asset(
         tdx,
         asset,
-        "MICHIGAN UNION",
-        "In Stock - Reserved",
-        notes="Checked in by Tech Consulting",
+        "Offsite",
+        "On Loan",
+        notes=notes,
+        update_inv_date=True
     )
