@@ -103,6 +103,10 @@ async def dropoff():
         "asset": {
             "tag": asset["Tag"],
             "id": asset["ID"],
+        },
+        "previous_owner": {
+            "uniqname": asset["OwningCustomerName"],
+            "uid": asset["OwningCustomerID"]
         }
     }
 
