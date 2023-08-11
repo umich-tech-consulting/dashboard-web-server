@@ -74,6 +74,40 @@ async def dropoff():
         raise exceptions.MissingBodyException
     if "asset" not in body:
         raise exceptions.MalformedBodyException
+    # Asset is SAHM, TRL, or SAH with digits
+    if not asset_pattern.match(body["asset"]):
+        raise exceptions.InvalidAssetException(body["asset"])
+
+    asset_task: asyncio.Task[dict[str, Any]] = \
+        asyncio.create_task(
+            asset_lib.find_asset(tdx, body["asset"]),
+            name="Find Asset"
+        )
+    
+    available_id: str = tdx.get_id(
+        "ITS EUC Assets/CIs",
+        "In Stock - Available",
+        "AssetStatusIDs"
+    )
+    asset: dict[str, Any] = await asset_task
+    if (asset["StatusID"] is available_id):
+        raise exceptions.AssetAlreadyCheckedInException(asset["Tag"])
+    if "comment" not in body:
+        body["comment"] = ""
+
+    await asset_lib.check_in_asset(
+        tdx,
+        asset
+    )
+    # Give some useful info back to the front end to display to user
+    response: dict[str, dict[str, Any]] = {
+        "asset": {
+            "tag": asset["Tag"],
+            "id": asset["ID"],
+        }
+    }
+
+    return response, HTTPStatus.OK
 
 
 @app.post("/tdx/loan/checkout")  # type : ignore
@@ -141,7 +175,7 @@ async def checkout():
 
     asset: dict[str, Any] = await asset_task
     if (asset["StatusID"] is not available_id):
-        raise exceptions.AssetNotReadyToLoan(asset["Tag"])
+        raise exceptions.AssetNotReadyToLoanException(asset["Tag"])
     # ... and then everything else
 
     if "comment" not in body:
@@ -267,12 +301,26 @@ async def handle_no_loan_request(
     return response, HTTPStatus.BAD_REQUEST
 
 
-@app.errorhandler(exceptions.AssetNotReadyToLoan)  # type: ignore
+@app.errorhandler(exceptions.AssetNotReadyToLoanException)  # type: ignore
 async def handle_asset_not_ready(
-    error: exceptions.AssetNotReadyToLoan
+    error: exceptions.AssetNotReadyToLoanException
 ):
     response = {
         "error_number": 7,
+        "message": error.message,
+        "attributes": {
+            "asset": error.asset,
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(exceptions.AssetAlreadyCheckedInException)  # type: ignore
+async def handle_asset_already_available(
+    error: exceptions.AssetAlreadyCheckedInException
+):
+    response = {
+        "error_number": 8,
         "message": error.message,
         "attributes": {
             "asset": error.asset,

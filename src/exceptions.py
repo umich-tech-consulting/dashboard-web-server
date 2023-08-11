@@ -62,7 +62,7 @@ class NoLoanRequestException(Exception):
         super().__init__(self.message)
 
 
-class AssetNotReadyToLoan(Exception):
+class AssetNotReadyToLoanException(Exception):
     """Asset is not in stock available."""
 
     def __init__(
@@ -85,4 +85,17 @@ class LoanAlreadyFullfilledException(Exception):
     ):
         self.ticket = ticket
         self.message = message
+        super().__init__(self.message)
+
+
+class AssetAlreadyCheckedInException(Exception):
+    """Asset is not in stock available."""
+
+    def __init__(
+            self,
+            asset: str,
+            message: str = "Asset already available"
+    ):
+        self.asset: str = asset
+        self.message: str = message
         super().__init__(self.message)
