@@ -262,8 +262,8 @@ async def check_in_asset(
     await inventory_asset(
         tdx,
         asset,
-        "Offsite",
-        "On Loan",
+        "MICHIGAN UNION",
+        "In Stock - Available",
         notes=notes,
         update_inv_date=True
     )
