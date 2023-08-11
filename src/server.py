@@ -200,7 +200,8 @@ async def checkout():
         "loan": {
             "name": ticket["RequestorName"],
             "date": loan_date,
-            "uniqname": owner["AlternateID"]
+            "uniqname": owner["AlternateID"],
+            "owner_uid": owner["UID"]
         },
         "ticket": {
             "id": ticket["ID"]
