@@ -53,9 +53,9 @@ async def init() -> None:
 #     return asset
 
 
-# @app.get("/tdx/currentuser")  # type: ignore
-# async def get_current_user() -> dict[str, Any]:
-#     return tdx.get_current_user()
+@app.get("/tdx/currentuser")  # type: ignore
+async def get_current_user() -> dict[str, Any]:
+    return tdx.get_current_user()
 
 
 # @app.get("/tdx/people/<uniqname>")  # type: ignore
