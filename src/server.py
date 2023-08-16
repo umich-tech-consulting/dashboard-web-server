@@ -99,7 +99,7 @@ async def dropoff():
         asset,
         body["comment"]
     )
-
+    person = await tdx.get_person(asset["OwningCustomerID"])
     # Give some useful info back to the front end to display to user
     response: dict[str, dict[str, Any]] = {
         "asset": {
@@ -108,7 +108,7 @@ async def dropoff():
             "comment": body["comment"]
         },
         "previous_owner": {
-            "uniqname": asset["OwningCustomerName"],
+            "uniqname": person["AlternateID"],
             "uid": asset["OwningCustomerID"]
         }
     }
