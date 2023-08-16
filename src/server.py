@@ -22,7 +22,7 @@ asset_pattern: re.Pattern[str] = \
     re.compile("^((TRL|SAH)[0-9]{5})|SAHM[0-9]{4}")
 
 tdx = tdxapi.TeamDynamixInstance(
-    domain="teamdynamix1.umich.edu",
+    domain="teamdynamix.umich.edu",
     sandbox=True,
     auth_token=str(os.getenv("TDX_KEY")),
     default_asset_app_name="ITS EUC Assets/CIs",
