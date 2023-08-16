@@ -107,7 +107,7 @@ async def dropoff():
             "comment": body["comment"]
         },
         "previous_owner": {
-            "uniqname": asset["OwningCustomerName"],
+            "full_name": asset["OwningCustomerName"],
             "uid": asset["OwningCustomerID"]
         }
     }

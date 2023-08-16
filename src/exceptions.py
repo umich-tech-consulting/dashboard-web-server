@@ -99,3 +99,6 @@ class AssetAlreadyCheckedInException(Exception):
         self.asset: str = asset
         self.message: str = message
         super().__init__(self.message)
+
+# class TDXConnectionBrokenException(Exception):
+#     """Unable to communicate with TDx."""
