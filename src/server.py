@@ -99,6 +99,7 @@ async def dropoff():
         asset,
         body["comment"]
     )
+
     # Give some useful info back to the front end to display to user
     response: dict[str, dict[str, Any]] = {
         "asset": {
@@ -107,7 +108,7 @@ async def dropoff():
             "comment": body["comment"]
         },
         "previous_owner": {
-            "full_name": asset["OwningCustomerName"],
+            "uniqname": asset["OwningCustomerName"],
             "uid": asset["OwningCustomerID"]
         }
     }
@@ -153,7 +154,9 @@ async def checkout():
 
     owner_task: asyncio.Task[dict[str, Any]] = \
         asyncio.create_task(
-            tdx.search_person(uniqname),
+            tdx.search_person({
+                "AlternateID": uniqname
+            }),
             name="Find Owner"
         )
 
@@ -223,17 +226,15 @@ async def test():
 
 
 @app.errorhandler(
-    tdxapi.exceptions.UniqnameDoesNotExistException
+    tdxapi.exceptions.PersonDoesNotExistException
 )  # type: ignore
-async def handle_uniqname_not_found(
-    error: tdxapi.exceptions.UniqnameDoesNotExistException
+async def handle_person_not_found(
+    error: tdxapi.exceptions.PersonDoesNotExistException
 ):
     response: dict[str, int | Any | dict[str, Any]] = {
         "error_number": 1,
         "message": error.message,
-        "attributes": {
-            "uniqname": error.uniqname
-        }
+        "attributes": error.criteria
     }
     return response, HTTPStatus.BAD_REQUEST
 
