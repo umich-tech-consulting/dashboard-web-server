@@ -228,13 +228,16 @@ async def test():
 @app.errorhandler(
     tdxapi.exceptions.PersonDoesNotExistException
 )  # type: ignore
-async def handle_person_not_found(
+async def handle_uniqname_not_found(
     error: tdxapi.exceptions.PersonDoesNotExistException
 ):
     response: dict[str, int | Any | dict[str, Any]] = {
         "error_number": 1,
         "message": error.message,
-        "attributes": error.criteria
+        "attributes": {
+            "uniqname": error.criteria["AlternateID"],
+            "criteria": error.criteria
+        }
     }
     return response, HTTPStatus.BAD_REQUEST
 
