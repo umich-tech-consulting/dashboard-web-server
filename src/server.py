@@ -11,7 +11,7 @@ import quart_cors
 import exceptions
 import re
 import asyncio
-
+from aiohttp import ClientError
 # Regex patterns
 
 # 3-8 alpha characters
@@ -336,6 +336,34 @@ async def handle_asset_already_available(
         "message": error.message,
         "attributes": {
             "asset": error.asset,
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(ClientError)  # type: ignore
+async def handle_tdx_communication_error(
+    error: ClientError
+):
+    response = {
+        "error_number": 9,
+        "message": "Unable to connect to TDx or slow response"
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(
+    tdxapi.exceptions.UnableToAttachAssetException
+)  # type: ignore
+async def handle_asset_attach_failure(
+    error: tdxapi.exceptions.UnableToAttachAssetException
+):
+    response = {
+        "error_number": 10,
+        "message": error.message,
+        "attributes": {
+            "ticket": error.ticket,
+            "asset": error.asset
         }
     }
     return response, HTTPStatus.BAD_REQUEST
