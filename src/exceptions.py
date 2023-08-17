@@ -75,19 +75,6 @@ class AssetNotReadyToLoanException(Exception):
         super().__init__(self.message)
 
 
-class LoanAlreadyFullfilledException(Exception):
-    """Laptop has already been provided for loan."""
-
-    def __init__(
-            self,
-            ticket: str,
-            message: str = "Loan has already been fulfilled"
-    ):
-        self.ticket = ticket
-        self.message = message
-        super().__init__(self.message)
-
-
 class AssetAlreadyCheckedInException(Exception):
     """Asset is not in stock available."""
 
@@ -109,4 +96,20 @@ class TDXCommunicationException(Exception):
             message: str = "Could not connect to TDx"
     ):
         self.message: str = message
+        super().__init__(self.message)
+
+
+class LoanAlreadyFulfilledException(Exception):
+    """Ticket already has asset attached (loan already completed)."""
+
+    def __init__(
+            self,
+            ticket: str,
+            asset: str,
+            message: str = "Loan already fulfilled"
+    ):
+        self.ticket = ticket
+        self.asset = asset
+        self.message = message
+
         super().__init__(self.message)

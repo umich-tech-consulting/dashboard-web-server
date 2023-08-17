@@ -153,19 +153,17 @@ async def checkout():
 
     # Gather info
 
-    owner_task: asyncio.Task[dict[str, Any]] = \
-        asyncio.create_task(
-            tdx.search_person({
-                "AlternateID": uniqname
-            }),
-            name="Find Owner"
-        )
+    owner_task: asyncio.Task[dict[str, Any]] = asyncio.create_task(
+        tdx.search_person({
+            "AlternateID": uniqname
+        }),
+        name="Find Owner"
+    )
 
-    asset_task: asyncio.Task[dict[str, Any]] = \
-        asyncio.create_task(
-            asset_lib.find_asset(tdx, body["asset"]),
-            name="Find Asset"
-        )
+    asset_task: asyncio.Task[dict[str, Any]] = asyncio.create_task(
+        asset_lib.find_asset(tdx, body["asset"]),
+        name="Find Asset"
+    )
 
     available_id: str = tdx.get_id(
         "ITS EUC Assets/CIs",
@@ -177,6 +175,14 @@ async def checkout():
     ticket: dict[str, Any] = \
         await asset_lib.find_sah_request_ticket(tdx, owner)
     ticket = tdx.get_ticket(ticket["ID"], "ITS Tickets")
+    ticket_assets = await tdx.get_ticket_assets(ticket["ID"])
+    if len(ticket_assets) > 0:
+        already_loaned_asset = \
+            await asset_lib.find_asset(tdx, ticket_assets[0]["ID"])
+        raise exceptions.LoanAlreadyFulfilledException(
+            ticket["ID"],
+            already_loaned_asset["Tag"]
+        )
     loan_date = tdx.get_ticket_attribute(
         ticket,
         "sah_Loan Length (Term)"
@@ -360,6 +366,21 @@ async def handle_asset_attach_failure(
 ):
     response = {
         "error_number": 10,
+        "message": error.message,
+        "attributes": {
+            "ticket": error.ticket,
+            "asset": error.asset
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(exceptions.LoanAlreadyFulfilledException)  # type: ignore
+async def handle_loan_already_fulfilled(
+    error: exceptions.LoanAlreadyFulfilledException
+):
+    response = {
+        "error_number": 11,
         "message": error.message,
         "attributes": {
             "ticket": error.ticket,
