@@ -89,7 +89,7 @@ async def dropoff():
         "AssetStatusIDs"
     )
     asset: dict[str, Any] = await asset_task
-    person = await tdx.get_person(asset["OwningCustomerID"])
+    
     if (asset["StatusID"] is available_id):
         raise exceptions.AssetAlreadyCheckedInException(asset["Tag"])
     if "comment" not in body:
@@ -100,7 +100,7 @@ async def dropoff():
         asset,
         comment=body["comment"]
     )
-    
+    person = await tdx.get_person(asset["OwningCustomerID"])
     # Give some useful info back to the front end to display to user
     response: dict[str, dict[str, Any]] = {
         "asset": {
