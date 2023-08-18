@@ -174,11 +174,12 @@ async def checkout():
     owner: dict[str, Any] = await owner_task
     ticket: dict[str, Any] = \
         await asset_lib.find_sah_request_ticket(tdx, owner)
+    
     ticket = tdx.get_ticket(ticket["ID"], "ITS Tickets")
     ticket_assets = await tdx.get_ticket_assets(ticket["ID"])
     if len(ticket_assets) > 0:
         already_loaned_asset = \
-            await asset_lib.find_asset(tdx, ticket_assets[0]["ID"])
+            await tdx.get_asset(ticket_assets[0]["BackingItemID"])
         raise exceptions.LoanAlreadyFulfilledException(
             ticket["ID"],
             already_loaned_asset["Tag"]
