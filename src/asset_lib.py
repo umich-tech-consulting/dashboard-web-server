@@ -149,11 +149,20 @@ async def find_sah_request_ticket(
         raise exceptions.NoLoanRequestException(person["AlternateID"])
 
     elif len(tickets) > 1:
-        raise tdxapi.exceptions.MultipleMatchesException("ticket")
+        valid_tickets: list[dict[str, Any]] = []
+        for ticket in tickets:
+            ticket_assets: list[dict[str, Any]] = \
+                await tdx.get_ticket_assets(ticket["ID"])
+            if len(ticket_assets) == 0:
+                valid_tickets.append(ticket)
+        if len(valid_tickets) > 1:
+            raise tdxapi.exceptions.MultipleMatchesException("ticket")
+        else:
+            return valid_tickets[0]
     else:
-        ticket: dict[str, Any] = tdx.get_ticket(tickets[0]["ID"])
-        print(f"Found ticket TDx {ticket['ID']}")
-        return ticket
+        loan_ticket: dict[str, Any] = tdx.get_ticket(tickets[0]["ID"])
+        print(f"Found ticket TDx {loan_ticket['ID']}")
+        return loan_ticket
 
 
 # def find_sah_drop_off_ticket(
