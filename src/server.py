@@ -23,7 +23,7 @@ asset_pattern: re.Pattern[str] = \
 
 tdx = tdxapi.TeamDynamixInstance(
     domain="teamdynamix.umich.edu",
-    sandbox=True,
+    sandbox=False,
     auth_token=str(os.getenv("TDX_KEY")),
     default_asset_app_name="ITS EUC Assets/CIs",
     default_ticket_app_name="ITS Tickets"

@@ -149,7 +149,7 @@ async def find_sah_request_ticket(
         raise exceptions.NoLoanRequestException(person["AlternateID"])
 
     elif len(tickets) > 1:
-        raise tdxapi.exceptions.MultipleMatchesException("person")
+        raise tdxapi.exceptions.MultipleMatchesException("ticket")
     else:
         ticket: dict[str, Any] = tdx.get_ticket(tickets[0]["ID"])
         print(f"Found ticket TDx {ticket['ID']}")
