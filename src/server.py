@@ -176,6 +176,11 @@ async def checkout():
         await asset_lib.find_sah_request_ticket(tdx, owner)
     
     ticket = tdx.get_ticket(ticket["ID"], "ITS Tickets")
+    approval_attribute = tdx.get_ticket_attribute(ticket, "sah_Request Status")
+    if (approval_attribute["Value"] not in [43072, 43071]):
+        exceptions.NoLoanRequestException(
+            owner["AlternateID"]
+        )
     ticket_assets = await tdx.get_ticket_assets(ticket["ID"])
     if len(ticket_assets) > 0:
         already_loaned_asset = \
@@ -186,7 +191,7 @@ async def checkout():
         )
     loan_date = tdx.get_ticket_attribute(
         ticket,
-        "sah_Loan Length (Term)"
+        "sah_Loan Length (Open date)"
     )["ValueText"]
 
     asset: dict[str, Any] = await asset_task
