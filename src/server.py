@@ -44,28 +44,9 @@ async def init() -> None:
 #####################
 
 
-# @app.route("/tdx/asset/<asset_tag>")  # type: ignore
-# async def get_asset(asset_tag: str) -> dict[str, Any]:
-#     assets: list[dict[str, Any]] = \
-#         await tdx.search_assets(asset_tag, "ITS EUC Assets/CIs")
-#     asset: dict[str, Any] = \
-#         await tdx.get_asset(assets[0]["ID"], "ITS EUC Assets/CIs")
-#     return asset
-
-
 @app.get("/tdx/currentuser")  # type: ignore
 async def get_current_user() -> dict[str, Any]:
     return tdx.get_current_user()
-
-
-# @app.get("/tdx/people/<uniqname>")  # type: ignore
-# async def get_person(uniqname: str) -> dict[str, Any]:
-#     return await tdx.search_person(uniqname)
-
-
-# @app.get("/tdx/ticket/<ticket_id>")  # type: ignore
-# async def get_ticket(ticket_id: str) -> dict[str, Any]:
-#     return tdx.get_ticket(ticket_id)
 
 @app.post("/tdx/loan/return")  # type : ignore
 async def dropoff():
@@ -119,6 +100,13 @@ async def dropoff():
 
 @app.post("/tdx/loan/checkout")  # type : ignore
 async def checkout():
+    # We can get everything we need for a loan from just the asset and uniqname
+    # by searching for matching loan tickets requested by the uniqname, pulling
+    # the approval status, loan date, and loaner type from the ticket. We make
+    # sure the asset is valid to loan (not already out, etc), attach to the
+    # request ticket, set location to Offsite, owner to provided uniqname,
+    # update the last inventory date, and add on loan until to notes
+
     body = await request.json
 
     # Error checking
@@ -132,10 +120,6 @@ async def checkout():
         raise exceptions.MalformedBodyException
     uniqname: str = body["uniqname"].lower()
 
-    # Uncomment if needed for error checking
-    # if uniqname == "mctester":
-    #     raise tdxapi.exceptions.MultipleMatchesException("person")
-
     # Account for caps
     # Uniqname is 3-8 alpha characters
     if not uniqname_pattern.match(uniqname):
@@ -144,14 +128,8 @@ async def checkout():
     if not asset_pattern.match(body["asset"]):
         raise exceptions.InvalidAssetException(body["asset"])
 
-    # We can get everything we need for a loan from just the asset and uniqname
-    # by searching for matching loan tickets requested by the uniqname, pulling
-    # the approval status, loan date, and loaner type from the ticket. We make
-    # sure the asset is valid to loan (not already out, etc), attach to the
-    # request ticket, set location to Offsite, owner to provided uniqname,
-    # update the last inventory date, and add on loan until to notes
-
-    # Gather info
+    # Gather owner, asset, status id for available assets, and ticket
+    # 
 
     owner_task: asyncio.Task[dict[str, Any]] = asyncio.create_task(
         tdx.search_person({
@@ -181,7 +159,7 @@ async def checkout():
         exceptions.NoLoanRequestException(
             owner["AlternateID"]
         )
-    ticket_assets = await tdx.get_ticket_assets(ticket["ID"])
+    ticket_assets: list[dict[str, Any]] = await tdx.get_ticket_assets(ticket["ID"])
     if len(ticket_assets) > 0:
         already_loaned_asset = \
             await tdx.get_asset(ticket_assets[0]["BackingItemID"])
@@ -228,15 +206,6 @@ async def checkout():
     }
 
     return response, HTTPStatus.OK
-
-
-@app.get("/test/sample_asset")  # type : ignore
-async def test():
-    with open('./resources/sample_asset.json') as asset_file:
-        sample_asset = json.load(asset_file)
-        time.sleep(5)
-        return sample_asset
-
 
 @app.errorhandler(
     tdxapi.exceptions.PersonDoesNotExistException
