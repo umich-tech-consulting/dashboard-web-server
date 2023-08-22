@@ -44,10 +44,6 @@ async def init() -> None:
 #####################
 
 
-@app.get("/tdx/currentuser")  # type: ignore
-async def get_current_user() -> dict[str, Any]:
-    return tdx.get_current_user()
-
 @app.post("/tdx/loan/return")  # type : ignore
 async def dropoff():
     body = await request.json
@@ -154,12 +150,14 @@ async def checkout():
         await asset_lib.find_sah_request_ticket(tdx, owner)
     
     ticket = tdx.get_ticket(ticket["ID"], "ITS Tickets")
-    approval_attribute = tdx.get_ticket_attribute(ticket, "sah_Request Status")
+    approval_attribute: dict[str, Any] = \
+        tdx.get_ticket_attribute(ticket, "sah_Request Status")
     if (approval_attribute["Value"] not in [43072, 43071]):
         exceptions.NoLoanRequestException(
             owner["AlternateID"]
         )
-    ticket_assets: list[dict[str, Any]] = await tdx.get_ticket_assets(ticket["ID"])
+    ticket_assets: list[dict[str, Any]] = \
+        await tdx.get_ticket_assets(ticket["ID"])
     if len(ticket_assets) > 0:
         already_loaned_asset = \
             await tdx.get_asset(ticket_assets[0]["BackingItemID"])
@@ -206,6 +204,7 @@ async def checkout():
     }
 
     return response, HTTPStatus.OK
+
 
 @app.errorhandler(
     tdxapi.exceptions.PersonDoesNotExistException
