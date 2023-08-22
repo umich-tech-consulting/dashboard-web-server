@@ -125,8 +125,6 @@ async def checkout():
         raise exceptions.InvalidAssetException(body["asset"])
 
     # Gather owner, asset, status id for available assets, and ticket
-    # 
-
     owner_task: asyncio.Task[dict[str, Any]] = asyncio.create_task(
         tdx.search_person({
             "AlternateID": uniqname
@@ -148,18 +146,29 @@ async def checkout():
     owner: dict[str, Any] = await owner_task
     ticket: dict[str, Any] = \
         await asset_lib.find_sah_request_ticket(tdx, owner)
-    
+
     ticket = tdx.get_ticket(ticket["ID"], "ITS Tickets")
+
+    # Check if ticket has been marked as approved for loan
     approval_attribute: dict[str, Any] = \
         tdx.get_ticket_attribute(ticket, "sah_Request Status")
-    if (approval_attribute["Value"] not in [43072, 43071]):
+    
+    if (approval_attribute["Value"]) == 43075:  # Request denied value
+        exceptions.LoanRequestDeniedException(
+            ticket=ticket["ID"],
+            requester=owner["AlternateID"]
+        )
+
+    if (approval_attribute["Value"] not in [43072, 43071]):  # Approved for Mac and Approved for Windows
         exceptions.NoLoanRequestException(
             owner["AlternateID"]
         )
+
+    # Check if ticket already has asset attached (loan already fulfilled)
     ticket_assets: list[dict[str, Any]] = \
         await tdx.get_ticket_assets(ticket["ID"])
     if len(ticket_assets) > 0:
-        already_loaned_asset = \
+        already_loaned_asset: dict[str, Any] = \
             await tdx.get_asset(ticket_assets[0]["BackingItemID"])
         raise exceptions.LoanAlreadyFulfilledException(
             ticket["ID"],
@@ -171,9 +180,21 @@ async def checkout():
     )["ValueText"]
 
     asset: dict[str, Any] = await asset_task
+
     if (asset["StatusID"] is not available_id):
         raise exceptions.AssetNotReadyToLoanException(asset["Tag"])
-    # ... and then everything else
+    if (approval_attribute["ValueText"] == "Windows" and 
+            "SAH0" not in asset["Tag"]):
+        raise exceptions.WrongAssetTypeException(
+            ticket["ID"],
+            approved_type="Windows",
+        )
+    if (approval_attribute["ValueText"] == "Mac" and
+            "SAHM" not in asset["Tag"]):
+        raise exceptions.WrongAssetTypeException(
+            ticket["ID"],
+            approved_type="Mac",
+        )
 
     if "comment" not in body:
         body["comment"] = ""
@@ -227,7 +248,7 @@ async def handle_uniqname_not_found(
 async def handle_object_not_found(
     error: exceptions.AssetNotFoundException
 ):
-    response = {
+    response: dict[str, int | str | dict[str, str]] = {
         "error_number": 2,
         "message": error.message,
         "attributes": {
@@ -241,7 +262,7 @@ async def handle_object_not_found(
 async def handle_multiple_matches(
     error: tdxapi.exceptions.MultipleMatchesException
 ):
-    response = {
+    response: dict[str, int | Any | dict[str, Any]] = {
         "error_number": 3,
         "message": error.message,
         "attributes": {
@@ -255,7 +276,7 @@ async def handle_multiple_matches(
 async def handle_invalid_uniqname(
     error: exceptions.InvalidUniqnameException
 ):
-    response = {
+    response: dict[str, int | str | dict[str, str]] = {
         "error_number": 4,
         "message": error.message,
         "attributes": {
@@ -269,7 +290,7 @@ async def handle_invalid_uniqname(
 async def handle_invalid_asset(
     error: exceptions.InvalidAssetException
 ):
-    response = {
+    response: dict[str, int | str | dict[str, str]] = {
         "error_number": 5,
         "message": error.message,
         "attributes": {
@@ -283,7 +304,7 @@ async def handle_invalid_asset(
 async def handle_no_loan_request(
     error: exceptions.NoLoanRequestException
 ):
-    response = {
+    response: dict[str, int | str | dict[str, str]] = {
         "error_number": 6,
         "message": error.message,
         "attributes": {
@@ -297,7 +318,7 @@ async def handle_no_loan_request(
 async def handle_asset_not_ready(
     error: exceptions.AssetNotReadyToLoanException
 ):
-    response = {
+    response: dict[str, int | str | dict[str, str]] = {
         "error_number": 7,
         "message": error.message,
         "attributes": {
@@ -311,7 +332,7 @@ async def handle_asset_not_ready(
 async def handle_asset_already_available(
     error: exceptions.AssetAlreadyCheckedInException
 ):
-    response = {
+    response: dict[str, int | str | dict[str, str]] = {
         "error_number": 8,
         "message": error.message,
         "attributes": {
@@ -325,7 +346,7 @@ async def handle_asset_already_available(
 async def handle_tdx_communication_error(
     error: ClientError
 ):
-    response = {
+    response: dict[str, int | str] = {
         "error_number": 9,
         "message": "Unable to connect to TDx or slow response"
     }
@@ -338,7 +359,7 @@ async def handle_tdx_communication_error(
 async def handle_asset_attach_failure(
     error: tdxapi.exceptions.UnableToAttachAssetException
 ):
-    response = {
+    response: dict[str, int | Any | dict[str, Any]] = {
         "error_number": 10,
         "message": error.message,
         "attributes": {
@@ -353,12 +374,37 @@ async def handle_asset_attach_failure(
 async def handle_loan_already_fulfilled(
     error: exceptions.LoanAlreadyFulfilledException
 ):
-    response = {
+    response: dict[str, int | str | dict[str, str]] = {
         "error_number": 11,
         "message": error.message,
         "attributes": {
             "ticket": error.ticket,
             "asset": error.asset
         }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(exceptions.WrongAssetTypeException)  # type: ignore
+async def handle_wrong_asset_approved(
+    error: exceptions.WrongAssetTypeException
+):
+    response: dict[str, int | str | dict[str, str]] = {
+        "error_number": 12,
+        "message": error.message,
+        "attributes": {
+            "approved_type": error.approved_type,
+        }
+    }
+    return response, HTTPStatus.BAD_REQUEST
+
+
+@app.errorhandler(exceptions.LoanRequestDeniedException)  # type: ignore
+async def handle_loan_request_denied(
+    error: exceptions.LoanRequestDeniedException
+):
+    response: dict[str, int | str] = {
+        "error_number": 13,
+        "message": error.message,
     }
     return response, HTTPStatus.BAD_REQUEST
