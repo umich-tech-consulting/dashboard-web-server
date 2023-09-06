@@ -87,7 +87,7 @@ async def dropoff():
         },
         "previous_owner": {
             "uniqname": person["AlternateID"],
-            "uid": asset["OwningCustomerID"]
+            "uid": person["UID"]
         }
     }
 
