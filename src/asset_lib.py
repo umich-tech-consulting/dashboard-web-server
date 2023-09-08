@@ -221,7 +221,7 @@ async def check_out_asset(
     print(f"Attached asset to ticket {ticket['ID']}")
     loan_period: str = tdx.get_ticket_attribute(
         ticket,
-        "sah_Loan Length (Open date)"
+        "sah_Date Needed Until"
     )["ValueText"]
     notes: str = (
         f"On Loan to {owner['AlternateID']} "
