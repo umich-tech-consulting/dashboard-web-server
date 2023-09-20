@@ -136,7 +136,7 @@ async def find_sah_request_ticket(
         "RequestorUids": [person["UID"]],
         "FormIDs": [tdx.get_id(
             "ITS Tickets",
-            "ITS-Sites @ Home - Form",
+            "ITS-Sites@Home - Form",
             "TicketFormIDs"
         )]
 
