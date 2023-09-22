@@ -5,7 +5,7 @@ from typing import Any
 import os
 import json
 import time
-import asset_lib
+import sahlib
 from http import HTTPStatus
 import quart_cors
 import exceptions
@@ -57,7 +57,7 @@ async def dropoff():
 
     asset_task: asyncio.Task[dict[str, Any]] = \
         asyncio.create_task(
-            asset_lib.find_asset(tdx, body["asset"]),
+            sahlib.find_asset(tdx, body["asset"]),
             name="Find Asset"
     )
     available_id: str = tdx.get_id(
@@ -72,7 +72,7 @@ async def dropoff():
     if "comment" not in body:
         body["comment"] = ""
     person = await tdx.get_person(asset["OwningCustomerID"])
-    await asset_lib.check_in_asset(
+    await sahlib.check_in_asset(
         tdx,
         asset,
         comment=body["comment"]
@@ -133,7 +133,7 @@ async def checkout():
     )
 
     asset_task: asyncio.Task[dict[str, Any]] = asyncio.create_task(
-        asset_lib.find_asset(tdx, body["asset"]),
+        sahlib.find_asset(tdx, body["asset"]),
         name="Find Asset"
     )
 
@@ -145,7 +145,7 @@ async def checkout():
 
     owner: dict[str, Any] = await owner_task
     ticket: dict[str, Any] = \
-        await asset_lib.find_sah_request_ticket(tdx, owner)
+        await sahlib.find_sah_request_ticket(tdx, owner)
 
     ticket = tdx.get_ticket(ticket["ID"], "ITS Tickets")
 
@@ -199,7 +199,7 @@ async def checkout():
     if "comment" not in body:
         body["comment"] = ""
 
-    await asset_lib.check_out_asset(
+    await sahlib.check_out_asset(
         tdx,
         asset,
         ticket,
