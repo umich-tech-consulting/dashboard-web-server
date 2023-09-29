@@ -1,3 +1,4 @@
 tdxapi
 quart
 quart-cors
+pyyaml

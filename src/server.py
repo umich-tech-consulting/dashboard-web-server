@@ -3,8 +3,6 @@ from quart import Quart, request
 import tdxapi
 from typing import Any
 import os
-import json
-import time
 import sahlib
 from http import HTTPStatus
 import quart_cors
@@ -12,6 +10,9 @@ import exceptions
 import re
 import asyncio
 from aiohttp import ClientError
+import yaml
+with open("dashboard.yml") as config_file:
+    config = yaml.safe_load(config_file)
 # Regex patterns
 
 # 3-8 alpha characters
@@ -22,20 +23,19 @@ asset_pattern: re.Pattern[str] = \
     re.compile("^((TRL|SAH)[0-9]{5})|SAHM[0-9]{4}")
 
 tdx = tdxapi.TeamDynamixInstance(
-    domain="teamdynamix.umich.edu",
-    sandbox=True,
-    auth_token=str(os.getenv("TDX_KEY")),
-    default_asset_app_name="ITS EUC Assets/CIs",
-    default_ticket_app_name="ITS Tickets"
+    domain=config["domain"],
+    sandbox=config["sandbox"],
+    default_asset_app_name=config["default_app_names"]["asset"],
+    default_ticket_app_name=config["default_app_names"]["ticket"]
 )
 app: Quart = Quart(__name__)
-app = quart_cors.cors(app, allow_origin="*")
+app = quart_cors.cors(app, allow_origin=config["allowed_origins"])
 
 
 @app.before_serving
 async def init() -> None:
+    await tdx.login()
     await tdx.initialize()
-
 
 #####################
 #                   #
@@ -66,7 +66,6 @@ async def dropoff():
         "AssetStatusIDs"
     )
     asset: dict[str, Any] = await asset_task
-    
     if (asset["StatusID"] is available_id):
         raise exceptions.AssetAlreadyCheckedInException(asset["Tag"])
     if "comment" not in body:
@@ -77,7 +76,7 @@ async def dropoff():
         asset,
         comment=body["comment"]
     )
-    
+
     # Give some useful info back to the front end to display to user
     response: dict[str, dict[str, Any]] = {
         "asset": {
@@ -114,11 +113,8 @@ async def checkout():
         raise exceptions.MalformedBodyException
     if "asset" not in body:
         raise exceptions.MalformedBodyException
-    uniqname: str = body["uniqname"].lower()
-
-    # Account for caps
-    # Uniqname is 3-8 alpha characters
-    if not uniqname_pattern.match(uniqname):
+    uniqname: str = body["uniqname"].lower()  # Account for caps
+    if not uniqname_pattern.match(uniqname):  # 3-8 alpha characters
         raise exceptions.InvalidUniqnameException(uniqname)
     # Asset is SAHM, TRL, or SAH with digits
     if not asset_pattern.match(body["asset"]):
@@ -152,18 +148,16 @@ async def checkout():
     # Check if ticket has been marked as approved for loan
     approval_attribute: dict[str, Any] = \
         tdx.get_ticket_attribute(ticket, "sah_Request Status")
-    
     if (approval_attribute["Value"]) == 43075:  # Request denied value
         exceptions.LoanRequestDeniedException(
             ticket=ticket["ID"],
             requester=owner["AlternateID"]
         )
-
-    if (approval_attribute["Value"] not in [43072, 43071]):  # Approved for Mac and Approved for Windows
+    # Approved for Mac and Approved for Windows
+    if (approval_attribute["Value"] not in [43072, 43071]):  
         exceptions.NoLoanRequestException(
             owner["AlternateID"]
         )
-
     # Check if ticket already has asset attached (loan already fulfilled)
     ticket_assets: list[dict[str, Any]] = \
         await tdx.get_ticket_assets(ticket["ID"])
