@@ -35,6 +35,7 @@ app = quart_cors.cors(app, allow_origin=config["allowed_origins"])
 @app.before_serving
 async def init() -> None:
     await tdx.login()
+    await tdx.load_ids()
     await tdx.initialize()
 
 #####################
@@ -42,6 +43,11 @@ async def init() -> None:
 #        TDX        #
 #                   #
 #####################
+
+
+@app.get("/tdx/currentuser")
+async def currentuser():
+    return tdx.get_current_user()
 
 
 @app.post("/tdx/loan/return")  # type : ignore

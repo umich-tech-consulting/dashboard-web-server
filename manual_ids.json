@@ -1,0 +1,110 @@
+[
+  {
+    "Name": "AssetAttributes",
+    "Attributes": [
+      {
+        "ID": 2492,
+        "Name": "Last Inventoried",
+        "Order": 0,
+        "Description": "",
+        "SectionID": 0,
+        "SectionName": null,
+        "FieldType": "textbox",
+        "DataType": "String",
+        "Choices": [],
+        "IsRequired": false,
+        "IsUpdatable": true,
+        "Value": "",
+        "ValueText": "",
+        "ChoicesText": "",
+        "AssociatedItemIDs": [
+          0
+        ]
+      },
+      {
+        "ID": 2238,
+        "Name": "Notes",
+        "Order": 0,
+        "Description": "",
+        "SectionID": 0,
+        "SectionName": null,
+        "FieldType": "textarea",
+        "DataType": "String",
+        "Choices": [],
+        "IsRequired": false,
+        "IsUpdatable": true,
+        "Value": "",
+        "ValueText": "",
+        "ChoicesText": "",
+        "AssociatedItemIDs": [
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "TicketAttributes",
+    "Attributes": [
+      {
+        "ID": 13384,
+        "Name": "sah_Request Status",
+        "Order": 0,
+        "Description": "",
+        "SectionID": 0,
+        "SectionName": null,
+        "FieldType": "vradio",
+        "DataType": "String",
+        "Choices": [
+          {
+            "ID": 43071,
+            "Name": "Approved for Windows laptop",
+            "IsActive": true,
+            "DateCreated": "2023-08-15T17:27:06.737Z",
+            "DateModified": "2023-08-15T17:27:06.737Z",
+            "Order": 0
+          },
+          {
+              "ID": 43072,
+              "Name": "Approved for Mac laptop",
+              "IsActive": true,
+              "DateCreated": "2023-08-15T17:27:18.76Z",
+              "DateModified": "2023-08-15T17:27:18.76Z",
+              "Order": 1
+          },
+          {
+              "ID": 43073,
+              "Name": "Waitlist for Windows laptop",
+              "IsActive": true,
+              "DateCreated": "2023-08-15T17:27:31.377Z",
+              "DateModified": "2023-08-15T17:27:31.377Z",
+              "Order": 2
+          },
+          {
+              "ID": 43074,
+              "Name": "Waitlist for Mac laptop",
+              "IsActive": true,
+              "DateCreated": "2023-08-15T17:27:54.43Z",
+              "DateModified": "2023-08-15T17:27:54.43Z",
+              "Order": 3
+          },
+          {
+              "ID": 43075,
+              "Name": "Request denied",
+              "IsActive": true,
+              "DateCreated": "2023-08-15T17:28:11.93Z",
+              "DateModified": "2023-08-15T17:28:11.93Z",
+              "Order": 4
+          }
+        ],
+        "IsRequired": false,
+        "IsUpdatable": true,
+        "Value": "",
+        "ValueText": "",
+        "ChoicesText": "",
+        "AssociatedItemIDs": [
+            0
+        ]
+      }
+    ]
+  }
+]
