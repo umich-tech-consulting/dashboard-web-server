@@ -1,6 +1,9 @@
 """Exceptions for dashboard-web-server."""
 
 
+from quart import request
+
+
 class MissingBodyException(Exception):
     """Missing body from request."""
 
@@ -110,6 +113,38 @@ class LoanAlreadyFulfilledException(Exception):
     ):
         self.ticket = ticket
         self.asset = asset
+        self.message = message
+
+        super().__init__(self.message)
+
+
+class WrongAssetTypeException(Exception):
+    """Ticket approves a different type of loaner than provided."""
+
+    def __init__(
+            self,
+            ticket: str,
+            approved_type: str,
+            message: str = "Wrong asset type for approval"
+    ):
+        self.ticket: str = ticket
+        self.approved_type: str = approved_type
+        self.message: str = message
+
+        super().__init__(self.message)
+
+
+class LoanRequestDeniedException(Exception):
+    """Loan request was denied."""
+
+    def __init__(
+            self,
+            ticket: str,
+            requester: str,
+            message: str = "Loan was denied"
+    ):
+        self.ticket = ticket
+        self.requester = requester
         self.message = message
 
         super().__init__(self.message)

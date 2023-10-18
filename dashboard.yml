@@ -1,0 +1,8 @@
+allowed_origins:
+  - glavon.net
+  - tech-consulting.it.umich.edu
+domain: teamdynamix.umich.edu
+default_app_names:
+  asset: ITS EUC Assets/CIs
+  ticket: ITS Tickets
+sandbox: true
