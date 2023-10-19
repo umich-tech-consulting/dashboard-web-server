@@ -176,7 +176,7 @@ async def checkout():
         )
     loan_date = tdx.get_ticket_attribute(
         ticket,
-        "sah_Loan Length (Open Date)"
+        "sah_Loan Length (Open date)"
     )["ValueText"]
 
     asset: dict[str, Any] = await asset_task
