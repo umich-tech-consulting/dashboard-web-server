@@ -162,6 +162,8 @@ async def find_sah_request_ticket(
             valid_tickets.append(ticket)
         if len(valid_tickets) > 1:
             raise tdxapi.exceptions.MultipleMatchesException("ticket")
+        elif len(valid_tickets) == 0:
+            raise exceptions.NoLoanRequestException(person["AlternateID"])
         else:
             print(f"Found ticket {valid_tickets[0]['ID']}")
             return valid_tickets[0]
