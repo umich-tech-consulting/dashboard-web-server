@@ -153,8 +153,13 @@ async def find_sah_request_ticket(
         for ticket in tickets:
             ticket_assets: list[dict[str, Any]] = \
                 await tdx.get_ticket_assets(ticket["ID"])
-            if len(ticket_assets) == 0:
-                valid_tickets.append(ticket)
+            if len(ticket_assets) != 0:
+                continue
+            # This makes sure the ticket form is the new version and has
+            # the expected attribute
+            if "sah_Request Status" not in ticket["Attributes"]:
+                continue
+            valid_tickets.append(ticket)
         if len(valid_tickets) > 1:
             raise tdxapi.exceptions.MultipleMatchesException("ticket")
         else:
