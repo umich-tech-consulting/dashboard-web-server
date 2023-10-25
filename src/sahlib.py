@@ -151,15 +151,9 @@ async def find_sah_request_ticket(
     else:
         valid_tickets: list[dict[str, Any]] = []
         for ticket in tickets:
-            ticket = tdx.get_ticket(ticket["ID"])
-            print(ticket["Attributes"])
             ticket_assets: list[dict[str, Any]] = \
                 await tdx.get_ticket_assets(ticket["ID"])
             if len(ticket_assets) != 0:
-                continue
-            # This makes sure the ticket form is the new version and has
-            # the expected attribute
-            if "sah_Request Status" not in ticket["Attributes"]:
                 continue
             print(f"{ticket['ID']} is valid")
             valid_tickets.append(ticket)
