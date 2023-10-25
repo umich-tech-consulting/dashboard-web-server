@@ -151,6 +151,7 @@ async def find_sah_request_ticket(
     else:
         valid_tickets: list[dict[str, Any]] = []
         for ticket in tickets:
+            ticket = tdx.get_ticket(ticket["ID"])
             print(ticket["Attributes"])
             ticket_assets: list[dict[str, Any]] = \
                 await tdx.get_ticket_assets(ticket["ID"])
