@@ -1,9 +1,5 @@
 """Exceptions for dashboard-web-server."""
 
-
-from quart import request
-
-
 class MissingBodyException(Exception):
     """Missing body from request."""
 
